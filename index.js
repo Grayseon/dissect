@@ -1,36 +1,42 @@
 import ky from "ky"
 import * as cheerio from "cheerio"
+import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.js"
+import Dissection from "./lib/Dissection.js"
+
+/** @typedef {import('../types/types').DissectOptions} */
 
 /**
  * Dissects a webpage
- * @param {string} url
- * @param {object} selectors
- * @returns {object} Results of the search
+ * @param {string} url URL to dissect
+ * @param {object} [selectors] CSS selectors to grab
+ * @param {DissectOptions} options Additional dissection options
+ * @see {@link DissectOptions} for more information about DissectOptions
+ * @returns {object|Dissection} Results of the search
+ * @throws {Error} Errors may be thrown due to network errors or invalid inputs
  */
-async function dissect(url, selectors){
-  if(typeof url !== "string") throw new Error('No URL provided')
-  if(typeof selectors !== "object") throw new Error('No selectors provided')
+async function dissect(url, selectors=undefined, options = {}){
+  urlSchema.parse(url)
+  selectorSchema.parse(selectors)
+  const validatedOptions = optionsSchema.parse(options)
 
-  const response = await ky(url).text()
-  const $ = cheerio.load(response)
-  let results = {}
-
-  Object.entries(selectors).forEach(([name, selector])=>{
-    const el = $(selector)
+  try {
+    const response = await ky(url).text()
+    const $ = cheerio.load(response)
+    const dissection = new Dissection($, validatedOptions)
     
-    if(el.length > 1){
-      let elementList = []
-      el.each((_, element)=>{
-        elementList.push($(element).text())
-      })
+    let results = {}
 
-      results[name] = elementList
-    }else{
-      results[name] = el.text()
+    if(selectors){
+      for(const [key, selector] of Object.entries(selectors)) {
+        results[key] = dissection.get(selector)
+      }
+      return results
+    } else {
+      return dissection
     }
-  })
-
-  return results
+  } catch(e) {
+    throw new Error(`Unable to dissect ${e}`)
+  }
 }
 
-export { dissect }
+export default dissect
