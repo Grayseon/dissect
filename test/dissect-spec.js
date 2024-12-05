@@ -25,6 +25,17 @@ describe('Invalid inputs', ()=>{
   it('should return null when no elements exist for selector', async ()=>{
     assert.deepStrictEqual(await dissect('https://en.wikipedia.org/wiki/Rose', {'broken': 'random nonexistent selector'}), {broken: null})
   })
+
+  it('should not allow a false tuple', async()=>{
+    try {
+      await dissect('https://en.wikipedia.org/wiki/Hydropower', {
+        title: ["title", 3]
+      })
+      assert.fail('Expected a ZodError because the custom tuple was false')
+    } catch (e) {
+      assert.ok(e instanceof ZodError)
+    }
+  })
 })
 
 const dissection = await dissect('https://en.wikipedia.org/wiki/Hydropower')
@@ -68,5 +79,37 @@ describe('Dissection', ()=>{
     })
     
     assert.strictEqual(result[0].text(), "Hydropower")
+  })
+
+  it('should support any scenarios', async ()=>{
+    const results = await dissect('https://en.wikipedia.org/wiki/Hydropower', {
+      title: "title", // Text extract
+      links: "a", // Also text extract
+      notes: ["*[role=note]", {
+        extract: "html"
+      }],
+      title2: [".mw-page-title-main", {
+        extract: "element"
+      }],
+      paragraphs: ["p", {
+        filter: function(data){
+          return data !== ''
+        }
+      }],
+      paragraphsWithoutFilter: "p"
+    })
+
+    const titleWorks = results.title[0] == "Hydropower - Wikipedia"
+    const linksWork = results.links[0] == "Jump to content"
+    const notesWork = results.notes[0] == 'This article is about the general concept of hydropower. For the use of hydropower for electricity generation, see <a href="/wiki/Hydroelectricity" title="Hydroelectricity">hydroelectricity</a>.'
+    const imagesWork = results.title2[0].text() == "Hydropower"
+    const filterWorks = results.paragraphs[0] !== ''
+
+    assert.ok(titleWorks)
+    assert.ok(linksWork)
+    assert.ok(notesWork)
+    assert.ok(imagesWork)
+    assert.ok(results.paragraphsWithoutFilter[0] == '', 'Unable to check filter, webpage might have changed.')
+    assert.ok(filterWorks)
   })
 })

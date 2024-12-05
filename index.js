@@ -28,7 +28,12 @@ async function dissect(url, selectors=undefined, options = {}){
 
     if(selectors){
       for(const [key, selector] of Object.entries(selectors)) {
-        results[key] = dissection.get(selector)
+        if(selector instanceof Array){
+          // User changed opts midway
+          results[key] = dissection.get(selector[0], selector[1])
+        }else{
+          results[key] = dissection.get(selector)
+        }
       }
       return results
     } else {
