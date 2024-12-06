@@ -10,4 +10,5 @@
  * @property {Function} [filter] Filter function takes in your function to filter the output. Used as the regular Array.prototype.filter()
  * @property {Function} [map] Map function takes in your function to map the output array. Used as the regular Array.prototype.map()
  * @property {Function} [postProcessing] Post-processing function can process the output array any way you would like. Function runs after filter and map.
+ * @property {Function} [granularPostProcessing] Granular post-processing function adds post-processing to each individual index of an output.
  */

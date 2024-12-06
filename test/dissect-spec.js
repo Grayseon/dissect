@@ -3,6 +3,18 @@ import dissect from "../index.js"
 import * as assert from "assert"
 import Dissection from "../lib/Dissection.js"
 
+import { readFileSync } from "fs"
+import { createServer } from "http"
+
+const server = createServer((_,res)=>{ // This server will be sent requests for testing
+  res.writeHead(200, { 'content-type': 'text/html' })
+  res.end(readFileSync('./test/site.html', 'utf-8'))
+})
+
+server.listen(8083)
+
+const url = 'http://localhost:8083'
+
 describe('Invalid inputs', () => {
   it('should not allow a blank url', async () => {
     try {
@@ -22,13 +34,13 @@ describe('Invalid inputs', () => {
     }
   })
 
-  it('should return null when no elements exist for selector', async () => {
-    assert.deepStrictEqual(await dissect('https://en.wikipedia.org/wiki/Rose', { 'broken': 'random nonexistent selector' }), { broken: null })
+  it('should return an empty array when no elements exist for selector', async () => {
+    assert.deepStrictEqual(await dissect(url, { 'broken': 'random nonexistent selector' }), { broken: [] })
   })
 
   it('should not allow a false tuple', async () => {
     try {
-      await dissect('https://en.wikipedia.org/wiki/Hydropower', {
+      await dissect(url, {
         title: ["title", 3]
       })
       assert.fail('Expected a ZodError because the custom tuple was false')
@@ -38,7 +50,7 @@ describe('Invalid inputs', () => {
   })
 })
 
-const dissection = await dissect('https://en.wikipedia.org/wiki/Hydropower')
+const dissection = await dissect(url)
 
 describe('Dissection', () => {
 
@@ -50,7 +62,7 @@ describe('Dissection', () => {
     try {
       const result = dissection.get("title")
 
-      assert.deepStrictEqual(result[0], "Hydropower - Wikipedia")
+      assert.deepStrictEqual(result[0], "Dissect")
     } catch (e) {
       assert.fail(e)
     }
@@ -62,33 +74,37 @@ describe('Dissection', () => {
       attr: "content"
     })
 
-    assert.strictEqual(result[0], "Hydropower - Wikipedia")
+    assert.strictEqual(result[0], "Dissect testing page")
   })
 
   it('should support html extraction', () => {
-    const result = dissection.get('.mw-heading a[title]', {
+    const result = dissection.get('#friendly-div', {
       extract: "html"
     })
 
-    assert.strictEqual(result[0], '<span>edit</span>')
+    assert.strictEqual(result[0], '<span>Hi!</span>')
   })
 
   it('should support element extraction', () => {
-    const result = dissection.get('.mw-page-title-main', {
+    const result = dissection.get('#friendly-div', {
       extract: "element"
     })
 
-    assert.strictEqual(result[0].text(), "Hydropower")
+    assert.strictEqual(result[0].text().trim(), "Hi!")
   })
 
   it('should support any scenarios', async () => {
-    const results = await dissect('https://en.wikipedia.org/wiki/Hydropower', {
+    const results = await dissect(url, {
       title: "title", // Text extract
       links: "a", // Also text extract
-      notes: ["*[role=note]", {
+      coverImage: ['meta[property="og:image"]', {
+        extract: "attr",
+        attr: "content"
+      }],
+      notes: ["#friendly-div", {
         extract: "html"
       }],
-      title2: [".mw-page-title-main", {
+      title2: ["h1", {
         extract: "element"
       }],
       paragraphs: ["p", {
@@ -96,29 +112,60 @@ describe('Dissection', () => {
         filter: function (data) {
           return data !== ''
         },
-        map: function(data){
+        map: function (data) {
           return data.replace(/e/g, '') // Removes every 'e'
         },
-        postProcessing: function (data){
-          data.pop()
-          return data
+        postProcessing: function (data) {
+          return data.reverse()
         }
       }],
       paragraphsWithoutFilters: "p"
     })
 
-    const titleWorks = results.title[0] == "Hydropower - Wikipedia"
-    const linksWork = results.links[0] == "Jump to content"
-    const notesWork = results.notes[0] == 'This article is about the general concept of hydropower. For the use of hydropower for electricity generation, see <a href="/wiki/Hydroelectricity" title="Hydroelectricity">hydroelectricity</a>.'
-    const imagesWork = results.title2[0].text() == "Hydropower"
-    const filterWorks = results.paragraphs[0] !== ''
+    const titleWorks = results.title[0] == "Dissect"
+    const linksWork = results.links[0] == "Go to ebay.com"
+    const notesWork = results.notes[0] == '<span>Hi!</span>'
+    const coverImageWorks = results.coverImage[0] == 'https://avatars.githubusercontent.com/u/9950313?s=48&v=4'
+    const imagesWork = results.title2[0].text() == "Dissect"
+    const filterWorks = results.paragraphs.indexOf('') == -1
+    const mapWorks = results.paragraphs[1].indexOf('e') == -1
+    const postProcessingWorks = results.paragraphs[2] == "This is paragraph 2"
 
-    assert.ok(titleWorks, 'Title did not work')
-    assert.ok(linksWork, 'Links did not work')
-    assert.ok(notesWork, 'Notes did not work')
-    assert.ok(imagesWork, 'Images did not work')
+    assert.ok(titleWorks, `Title did not work ${results.title[0]}`)
+    assert.ok(linksWork, `Links did not work ${results.links[0]}`)
+    assert.ok(notesWork, `Notes did not work ${results.notes[0]}`)
+    assert.ok(coverImageWorks, `Cover image did not work ${results.coverImage[0]}`)
+    assert.ok(imagesWork, `Images did not work ${results.title2[0].text()}`)
     assert.ok(results.paragraphs.length > 1, 'Paragraphs is an empty array')
-    assert.ok(results.paragraphsWithoutFilters[0] == '', 'Unable to check filter, webpage might have changed.')
     assert.ok(filterWorks, 'Filter did not work')
+    assert.ok(mapWorks, 'Map did not work')
+    assert.ok(postProcessingWorks, `Post-processing does not work`)
+  })
+
+  it('should support function options when they are not granular', async () => {
+    const results = await dissect(url, {
+      paragraphs: 'p'
+    }, {
+      filter: function (data) {
+        return data !== ''
+      },
+      map: function (data) {
+        return data.replace(/e/g, '') // Removes every 'e'
+      },
+      postProcessing: function (data) {
+        return data.reverse()
+      }
+    })
+
+    server.close()
+
+    const filterWorks = results.paragraphs.indexOf('') == -1
+    const mapWorks = results.paragraphs[1].indexOf('e') == -1
+    const postProcessingWorks = results.paragraphs[2] == "This is paragraph 2"
+
+    assert.ok(filterWorks, 'Filter did not work')
+    assert.ok(mapWorks, 'Map did not work')
+    assert.ok(postProcessingWorks, 'Post-processing does not work')
+
   })
 })
