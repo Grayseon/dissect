@@ -11,10 +11,10 @@ import Dissection from "./lib/Dissection.js"
  * @param {object} [selectors] CSS selectors to grab
  * @param {DissectOptions} options Additional dissection options
  * @see {@link DissectOptions} for more information about DissectOptions
- * @returns {object|Dissection} Results of the search
+ * @returns {object|Dissection} Results of the search. If no selectors are initially provided, it will return a Dissection constructor.
  * @throws {Error} Errors may be thrown due to network errors or invalid inputs
  */
-async function dissect(url, selectors=undefined, options = {}){
+async function dissect(url, selectors = undefined, options = {}) {
   urlSchema.parse(url)
   selectorSchema.parse(selectors)
   const validatedOptions = optionsSchema.parse(options)
@@ -23,15 +23,15 @@ async function dissect(url, selectors=undefined, options = {}){
     const response = await ky(url).text()
     const $ = cheerio.load(response)
     const dissection = new Dissection($, validatedOptions)
-    
+
     let results = {}
 
-    if(selectors){
-      for(const [key, selector] of Object.entries(selectors)) {
-        if(selector instanceof Array){
+    if (selectors) {
+      for (const [key, selector] of Object.entries(selectors)) {
+        if (selector instanceof Array) {
           // User changed opts midway
           results[key] = dissection.get(selector[0], selector[1])
-        }else{
+        } else {
           results[key] = dissection.get(selector)
         }
       }
@@ -39,7 +39,7 @@ async function dissect(url, selectors=undefined, options = {}){
     } else {
       return dissection
     }
-  } catch(e) {
+  } catch (e) {
     throw new Error(`Unable to dissect ${e}`)
   }
 }
