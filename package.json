@@ -1,5 +1,5 @@
 {
-  "name": "dissect",
+  "name": "web-dissect",
   "version": "1.0.0",
   "description": "Web scraping",
   "main": "index.js",
