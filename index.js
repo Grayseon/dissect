@@ -1,9 +1,9 @@
+/** @typedef {import('../types/types').DissectOptions} */
 import ky from "ky"
 import * as cheerio from "cheerio"
 import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.js"
+import { iterateSelectors } from "./lib/selectorEval.js"
 import Dissection from "./lib/Dissection.js"
-
-/** @typedef {import('../types/types').DissectOptions} */
 
 /**
  * Dissects a webpage
@@ -18,29 +18,22 @@ async function dissect(url, selectors = undefined, options = {}) {
   urlSchema.parse(url)
   selectorSchema.parse(selectors)
   const validatedOptions = optionsSchema.parse(options)
+  let response
+  let $
 
   try {
-    const response = await ky(url).text()
-    const $ = cheerio.load(response)
-    const dissection = new Dissection($, validatedOptions)
-
-    let results = {}
-
-    if (selectors) {
-      for (const [key, selector] of Object.entries(selectors)) {
-        if (selector instanceof Array) {
-          // User changed opts midway
-          results[key] = dissection.get(selector[0], selector[1])
-        } else {
-          results[key] = dissection.get(selector)
-        }
-      }
-      return results
-    } else {
-      return dissection
-    }
+    response = await ky(url).text()
+    $ = cheerio.load(response)
   } catch (e) {
-    throw new Error(`Unable to dissect ${e}`)
+    throw new Error(`Error while processing URL: ${e}`)
+  }
+
+  const dissection = new Dissection($, validatedOptions)
+
+  if (selectors) {
+    return iterateSelectors(selectors, dissection, validatedOptions)
+  } else {
+    return dissection
   }
 }
 

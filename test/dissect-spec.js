@@ -6,14 +6,26 @@ import Dissection from "../lib/Dissection.js"
 import { readFileSync } from "fs"
 import { createServer } from "http"
 
-const server = createServer((_,res)=>{ // This server will be sent requests for testing
-  res.writeHead(200, { 'content-type': 'text/html' })
-  res.end(readFileSync('./test/site.html', 'utf-8'))
+const url = 'http://localhost:8083'
+let server
+
+before(() => {
+  console.log('starting server')
+  try {
+    server = createServer((_, res) => { // This server will be sent requests for testing
+      res.writeHead(200, { 'content-type': 'text/html' })
+      res.end(readFileSync('./test/site.html', 'utf-8'))
+    })
+
+    server.listen(8083)
+  } catch (e) {
+    console.log(`didnt start server ${e}`)
+  }
 })
 
-server.listen(8083)
-
-const url = 'http://localhost:8083'
+after(() => {
+  server.close()
+})
 
 describe('Invalid inputs', () => {
   it('should not allow a blank url', async () => {
@@ -50,9 +62,13 @@ describe('Invalid inputs', () => {
   })
 })
 
-const dissection = await dissect(url)
 
 describe('Dissection', () => {
+  let dissection
+
+  before(async () => {
+    dissection = await dissect(url)
+  })
 
   it('should return a constructor instead of an object when no selectors are passed', () => {
     assert.ok(dissection instanceof Dissection, "Dissection is not the proper constructor. This will likely cause most following tests to fail.")
@@ -109,15 +125,15 @@ describe('Dissection', () => {
       }],
       paragraphs: ["p", {
         extract: "text",
-        filter: function (data) {
-          return data !== ''
-        },
-        map: function (data) {
-          return data.replace(/e/g, '') // Removes every 'e'
-        },
-        postProcessing: function (data) {
-          return data.reverse()
-        }
+        filter: (data) => (
+          data !== ''
+        ),
+        map: (data) => (
+          data.replace(/e/g, '') // Removes every 'e'
+        ),
+        postProcessing: (data) => (
+          data.reverse()
+        )
       }],
       paragraphsWithoutFilters: "p"
     })
@@ -146,18 +162,16 @@ describe('Dissection', () => {
     const results = await dissect(url, {
       paragraphs: 'p'
     }, {
-      filter: function (data) {
-        return data !== ''
-      },
-      map: function (data) {
-        return data.replace(/e/g, '') // Removes every 'e'
-      },
-      postProcessing: function (data) {
-        return data.reverse()
-      }
+      filter: (data) => (
+        data !== ''
+      ),
+      map: (data) => (
+        data.replace(/e/g, '') // Removes every 'e'
+      ),
+      postProcessing: (data) => (
+        data.reverse()
+      )
     })
-
-    server.close()
 
     const filterWorks = results.paragraphs.indexOf('') == -1
     const mapWorks = results.paragraphs[1].indexOf('e') == -1
@@ -166,6 +180,24 @@ describe('Dissection', () => {
     assert.ok(filterWorks, 'Filter did not work')
     assert.ok(mapWorks, 'Map did not work')
     assert.ok(postProcessingWorks, 'Post-processing does not work')
+  })
 
+  it('should an array of selectors', async () => {
+    const results = await dissect(url, {
+      "paragraphs": "p",
+      "author": [
+        "meta[name=author]",
+        ["script[type='application/ld+json']", {
+          map: (data) => (
+            JSON.parse(data).author?.name
+          )
+        }],
+        'p',
+      ],
+    }, {
+      arrayType: "flatAll"
+    })
+
+    console.log('results', results)
   })
 })
