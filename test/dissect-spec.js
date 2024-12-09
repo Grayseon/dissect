@@ -1,5 +1,5 @@
 import { ZodError } from "zod"
-import dissect from "../index.js"
+import { dissect, html } from "../index.js"
 import * as assert from "assert"
 import Dissection from "../lib/Dissection.js"
 
@@ -205,10 +205,9 @@ describe('Dissection', () => {
       map: (data) => {
         console.log(data)
         return data
-      },
-      arrayType: "priority"
+      }
     })
 
-    console.log('results', results)
+    console.log('html', html`<p>Hi</p>`)
   })
 })
