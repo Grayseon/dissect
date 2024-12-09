@@ -182,7 +182,7 @@ describe('Dissection', () => {
     assert.ok(postProcessingWorks, 'Post-processing does not work')
   })
 
-  it('should an array of selectors', async () => {
+  it('should support an array of selectors', async () => {
     const results = await dissect(url, {
       "paragraphs": "p",
       "author": [
@@ -194,8 +194,6 @@ describe('Dissection', () => {
         }],
         'p',
       ],
-    }, {
-      arrayType: "flatAll"
     })
 
     console.log('results', results)
