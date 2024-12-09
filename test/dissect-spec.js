@@ -184,16 +184,29 @@ describe('Dissection', () => {
 
   it('should support an array of selectors', async () => {
     const results = await dissect(url, {
-      "paragraphs": "p",
+      "paragraphs": [[
+        ["meta", {
+          extract: "attr",
+          attr: "content"
+        }],
+        ["h1", {
+          filter: ()=>(false)
+        }],
+        "p",
+      ], {
+        arrayType: "priority"
+      }],
       "author": [
         "meta[name=author]",
-        ["script[type='application/ld+json']", {
-          map: (data) => (
-            JSON.parse(data).author?.name
-          )
-        }],
+        "script[type='application/ld+json']",
         'p',
       ],
+    }, {
+      map: (data) => {
+        console.log(data)
+        return data
+      },
+      arrayType: "priority"
     })
 
     console.log('results', results)
