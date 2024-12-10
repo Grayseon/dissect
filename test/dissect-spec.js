@@ -1,5 +1,5 @@
 import { ZodError } from "zod"
-import { dissect, html } from "../index.js"
+import dissect from "../index.js"
 import * as assert from "assert"
 import Dissection from "../lib/Dissection.js"
 
@@ -183,7 +183,7 @@ describe('Dissection', () => {
   })
 
   it('should support an array of selectors', async () => {
-    const results = await dissect(url, {
+    const results = await dissect(readFileSync('./test/site.html', 'utf-8'), {
       "paragraphs": [[
         ["meta", {
           extract: "attr",
@@ -207,7 +207,5 @@ describe('Dissection', () => {
         return data
       }
     })
-
-    console.log('html', html`<p>Hi</p>`)
   })
 })

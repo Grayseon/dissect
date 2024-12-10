@@ -3,7 +3,6 @@ import ky from "ky"
 import * as cheerio from "cheerio"
 import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.js"
 import { iterateSelectors } from "./lib/selectorEval.js"
-import html from "./lib/html.js"
 import Dissection from "./lib/Dissection.js"
 
 /**
@@ -38,4 +37,4 @@ async function dissect(url, selectors = undefined, options = {}) {
   }
 }
 
-export { dissect, html }
+export default dissect
