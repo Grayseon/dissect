@@ -14,12 +14,18 @@ import Dissection from "./lib/Dissection.js"
  * @returns {object|Dissection} Results of the search. If no selectors are initially provided, it will return a Dissection constructor.
  * @throws {Error} Errors may be thrown due to network errors or invalid inputs
  */
-async function dissect(url, selectors = undefined, options = {}) {
+async function dissect<T extends object>(
+  url: string,
+  selectors?: T,
+  options: DissectOptions = {}
+): Promise<
+  T extends undefined ? Dissection : { [K in keyof T]: string }
+> {
   urlSchema.parse(url)
   selectorSchema.parse(selectors)
   const validatedOptions = optionsSchema.parse(options)
-  let response
-  let $
+  let response: string
+  let $: cheerio.CheerioAPI
 
   try {
     response = await ky(url).text()
@@ -31,9 +37,9 @@ async function dissect(url, selectors = undefined, options = {}) {
   const dissection = new Dissection($, validatedOptions)
 
   if (selectors) {
-    return iterateSelectors(selectors, dissection, validatedOptions)
+    return iterateSelectors(selectors, dissection, validatedOptions) as { [K in keyof T]: string }
   } else {
-    return dissection
+    return dissection as T extends undefined ? Dissection : never
   }
 }
 

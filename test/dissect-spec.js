@@ -1,5 +1,5 @@
 import { ZodError } from "zod"
-import dissect from "../index.js"
+import dissect from "../index.ts"
 import * as assert from "assert"
 import Dissection from "../lib/Dissection.js"
 
@@ -209,3 +209,9 @@ describe('Dissection', () => {
     })
   })
 })
+
+const response = await dissect("hi", {}, {
+  title: "title"
+})
+
+response.title
