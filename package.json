@@ -2,9 +2,10 @@
   "name": "web-dissect",
   "version": "1.0.0",
   "description": "Web scraping",
-  "main": "index.js",
+  "main": "index.ts",
   "scripts": {
-    "test": "mocha"
+    "test": "mocha",
+    "build:cjs": ""
   },
   "author": "Grayseon",
   "license": "ISC",
@@ -14,7 +15,17 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "mocha": "^11.0.1"
+    "mocha": "^11.0.1",
+    "@babel/cli": "^7.26.4",
+    "@babel/core": "^7.26.0",
+    "@babel/preset-env": "^7.26.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Grayseon/dissect.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Grayseon/dissect/issues"
   },
   "type": "module"
 }
