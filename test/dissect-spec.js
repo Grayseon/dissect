@@ -1,7 +1,7 @@
 import { ZodError } from "zod"
-import dissect from "../index.ts"
+import dissect from "../src/index.ts"
 import * as assert from "assert"
-import Dissection from "../lib/Dissection.js"
+import Dissection from "../src/lib/Dissection.js"
 
 import { readFileSync } from "fs"
 import { createServer } from "http"
@@ -214,4 +214,4 @@ const response = await dissect("hi", {}, {
   title: "title"
 })
 
-response.title
+response

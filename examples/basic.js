@@ -1,4 +1,4 @@
-import dissect from "../index.js"
+import dissect from "../src/index.ts"
 
 const data = await dissect('https://en.wikipedia.org/wiki/Linus_Torvalds', {
   coverImage: 'meta[property="og:image"]',
