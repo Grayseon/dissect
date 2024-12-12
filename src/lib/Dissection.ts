@@ -1,5 +1,5 @@
 import { optionsSchema } from './validators.js'
-import { DissectOptions, DissectSelector} from "../types/types.ts"
+import { DissectOptions } from "../types/types.ts"
 import { CheerioAPI } from 'cheerio'
 
 /** Dissection for a page. Allows you to get data from a page after-the-fact */

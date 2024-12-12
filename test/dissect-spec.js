@@ -210,8 +210,10 @@ describe('Dissection', () => {
   })
 })
 
-const response = await dissect("hi", {}, {
+const response = await dissect("hi", {
   title: "title"
+}, {
+  extract: "text"
 })
 
 response

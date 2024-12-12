@@ -4,13 +4,18 @@ import z from 'zod'
 /**
  * Options for a dissection
  */
-type DissectOptions = z.infer<typeof optionsSchema>
+type DissectOptions = Readonly<z.infer<typeof optionsSchema>>
 
 /**
  * The selectors of a dissection
  */
-type DissectSelector = z.infer<typeof selectorSchema>
+type DissectSelector = Readonly<z.infer<typeof selectorSchema>>
 
-type Results = { [key: string]: (string | string[])[] } | {}
+type Results<K extends string = string> = { [key in K]: (string | string[])[] }
 
-export { DissectOptions, DissectSelector, Results }
+interface SelectorPair {
+  selectors: string | string[];
+  options: DissectOptions;
+}
+
+export { DissectOptions, DissectSelector, Results, SelectorPair }

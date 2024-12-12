@@ -3,7 +3,8 @@ import * as cheerio from "cheerio"
 import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.js"
 import { iterateSelectors } from "./lib/selectorEval.js"
 import Dissection from "./lib/Dissection.ts"
-import { DissectOptions, DissectSelector, Results } from "./types/types.js"
+import DissectionError from "./lib/DissectionError.ts"
+import { DissectOptions, DissectSelector } from "./types/types.js"
 
 /**
  * Dissects a webpage
@@ -18,7 +19,7 @@ async function dissect<T extends DissectSelector>(
   selectors?: T,
   options?: DissectOptions
 ): Promise<
-  T extends undefined ? Dissection : Results
+  T extends undefined ? Dissection : { [K in keyof T]: any[]}
 > {
   urlSchema.parse(url)
   selectorSchema.parse(selectors)
@@ -30,13 +31,13 @@ async function dissect<T extends DissectSelector>(
     response = await ky(url).text()
     $ = cheerio.load(response)
   } catch (e) {
-    throw new Error(`Error while processing URL: ${e}`)
+    throw new DissectionError(`Error while processing URL: ${e}`)
   }
 
   const dissection = new Dissection($, validatedOptions)
 
   if (selectors) {
-    return iterateSelectors(selectors, dissection, validatedOptions) as { [K in keyof T]: any[]}
+    return iterateSelectors(selectors, dissection, validatedOptions) as unknown as T extends undefined ? Dissection : { [K in keyof T]: any[]}
   } else {
     return dissection as T extends undefined ? Dissection : { [K in keyof T]: any[]}
   }
