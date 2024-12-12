@@ -2,7 +2,7 @@ import ky from "ky"
 import * as cheerio from "cheerio"
 import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.js"
 import { iterateSelectors } from "./lib/selectorEval.js"
-import Dissection from "./lib/Dissection.js"
+import Dissection from "./lib/Dissection.ts"
 import { DissectOptions, DissectSelector, Results } from "./types/types.js"
 
 /**

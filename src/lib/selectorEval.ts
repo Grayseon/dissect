@@ -11,7 +11,7 @@ function addToResults(key: string, value: any, results: Results): object {
   return results
 }
 
-function processSelectorArray(selectors: DissectSelector, key: string, dissection: Dissection, options: DissectOptions, results: Results, depth: number) {
+function processSelectorArray(selectors: string[], key: string, dissection: Dissection, options: DissectOptions, results: Results, depth: number) {
   const iterations: any[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
 
   // Every output is checked if existant. If it is null it returns []. This might be triggered if there are no selectors or if the filter filters everything out.
@@ -78,14 +78,14 @@ function iterateObjectSelectors<T extends object>(selectors: T, dissection: Diss
 function iterateArraySelectors<T extends string[]>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
   if (depth > options.maxDepth) throw new Error(`Maximum recursion depth of ${options.maxDepth} exceeded`)
 
-  let results = [] as T
+  let results: string[] = [] as unknown as T
 
   selectors.forEach((selector: string, i: number) => {
     // A selector might be "title"
     addToResults(i.toString(), dissection.get(selector, options), results)
   })
 
-  return results
+  return results as T
 }
 
 export { processSelectorArray, iterateSelectors }
