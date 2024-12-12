@@ -12,7 +12,7 @@ function addToResults(key: string, value: any, results: Results): object {
 }
 
 function processSelectorArray(selectors: DissectSelector, key: string, dissection: Dissection, options: DissectOptions, results: Results, depth: number) {
-  const iterations: any[] = iterateSelectors(selectors, dissection, options, depth + 1)
+  const iterations: any[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
 
   // Every output is checked if existant. If it is null it returns []. This might be triggered if there are no selectors or if the filter filters everything out.
   switch (options.arrayType) {
@@ -31,48 +31,57 @@ function processSelectorArray(selectors: DissectSelector, key: string, dissectio
   return results
 }
 
-function iterateSelectors<T extends DissectSelector>(selectors: T, dissection: Dissection, options: DissectOptions, depth = 0): T extends any[] ? any[] : Results {
+function iterateSelectors<T extends object>(selectors: T, dissection: Dissection, options: DissectOptions, depth = 0): T {
+  if(Array.isArray(selectors)){
+    return iterateArraySelectors(selectors, dissection, options, depth)
+  }else{
+    return iterateObjectSelectors(selectors, dissection, options, depth)
+  }
+}
+
+/** Iterate through an object selector. For example, an object selector might look like:
+ * {
+ *  title: "title",
+ *  paragraphs: ["p", {
+ *    extract: "text"
+ *  }]
+ * }
+ */
+function iterateObjectSelectors<T extends object>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
   if (depth > options.maxDepth) throw new Error(`Maximum recursion depth of ${options.maxDepth} exceeded`)
 
-  let results = Array.isArray(selectors) ? [] : {} // If they provided multiple selectors as an array it will be an array of results, but if they provided an object of selectors they will get an object result
+  let results = {} as T
 
   for (const [key, selector] of Object.entries(selectors)) {
-    if (Array.isArray(selector)) { // Selector will be an array if the user provides multiple selectors or if the user wants to change the options
-      if (typeof selector[1] == 'object' && !(Array.isArray(selector[1]))) { // User is providing one selector or an array of selectors and changing the options [selectors, options]
-        if(Array.isArray(selector[0])){
-          processSelectorArray(selector[0], key, dissection, { ...options, ...selector[1] }, results, depth)
-        } else {
-          addToResults(key, dissection.get(selector[0], { ...options, ...selector[1] }), results) // [0] is selector as a string, [1] is options
-        }
-      } else if (typeof selector[1] == "string") {
-        processSelectorArray(selector, key, dissection, options, results, depth)
-      } else {
-        throw new Error(`Unexpected second index of selector. Expected an object or array, got ${selector[1]}`)
+    // A key, value pair might be { key: "paragraphs", selector: "p"}
+    // or "1": { key: "paragraphs", selector: ["p", { extract: "text" }]}
+    if (typeof selector[1] == 'object' && !(Array.isArray(selector[1]))) { // User is providing new, custom options
+      const formattedPair = {
+        selectors: selector[0],
+        options: selector[1]
       }
-    } else {
-      addToResults(key, dissection.get(selector, options), results)
+
+      if (typeof formattedPair.selectors == "string") { // Or "if they are passing a single selector"
+        addToResults(key, dissection.get(selector[0], { ...options, ...formattedPair.options }), results)
+      } else if (Array.isArray(formattedPair.selectors)) { // Or "if they are passing multiple selectors"
+        processSelectorArray(formattedPair.selectors, key, dissection, { ...options, ...formattedPair.options }, results, depth)
+      }
     }
   }
 
   return results
 }
 
-function iterateObjectSelectors(selectors: DissectSelector, dissection: Dissection, options: DissectOptions, depth: number = 0): Results {
-  if(depth > options.maxDepth) throw new Error(`Maximum recursion depth of ${options.maxDepth} exceeded`)
+/** Iterate through an array selector. For example, an array selector might look like:
+ * ["title", "p", "meta=[property=title]"]
+ */
+function iterateArraySelectors<T extends string[]>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
+  if (depth > options.maxDepth) throw new Error(`Maximum recursion depth of ${options.maxDepth} exceeded`)
 
-  let results = {}
+  let results = [] as T
 
-  for(const [key, selector] of Object.entries(selectors)){
-    if()
-  }
-}
-
-function iterateArraySelectors(selectors: string[], dissection: Dissection, options: DissectOptions, depth: number = 0): any[] {
-  if(depth > options.maxDepth) throw new Error(`Maximum recursion depth of ${options.maxDepth} exceeded`)
-
-  let results = []
-
-  selectors.forEach((selector,i)=>{
+  selectors.forEach((selector: string, i: number) => {
+    // A selector might be "title"
     addToResults(i.toString(), dissection.get(selector, options), results)
   })
 
