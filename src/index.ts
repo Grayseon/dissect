@@ -1,10 +1,10 @@
 import ky from "ky"
 import * as cheerio from "cheerio"
-import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.js"
+import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.ts"
 import { iterateSelectors } from "./lib/selectorEval.js"
 import Dissection from "./lib/Dissection.ts"
 import DissectionError from "./lib/DissectionError.ts"
-import { DissectOptions, DissectSelector } from "./types/types.js"
+import { DissectOptions, DissectSelector, Results } from "./types/types.js"
 
 /**
  * Dissects a webpage
@@ -19,7 +19,7 @@ async function dissect<T extends DissectSelector>(
   selectors?: T,
   options?: DissectOptions
 ): Promise<
-  T extends undefined ? Dissection : { [K in keyof T]: any[]}
+  T extends undefined ? Dissection : { [K in keyof T]: (string|string[])[]}
 > {
   urlSchema.parse(url)
   selectorSchema.parse(selectors)
@@ -37,9 +37,9 @@ async function dissect<T extends DissectSelector>(
   const dissection = new Dissection($, validatedOptions)
 
   if (selectors) {
-    return iterateSelectors(selectors, dissection, validatedOptions) as unknown as T extends undefined ? Dissection : { [K in keyof T]: any[]}
+    return iterateSelectors(selectors as Results, dissection, validatedOptions) as unknown as T extends undefined ? Dissection : { [K in keyof T]: (string|string[])[]}
   } else {
-    return dissection as T extends undefined ? Dissection : { [K in keyof T]: any[]}
+    return dissection as T extends undefined ? Dissection : { [K in keyof T]: (string|string[])[]}
   }
 }
 

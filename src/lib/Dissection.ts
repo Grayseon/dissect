@@ -1,4 +1,4 @@
-import { optionsSchema } from './validators.js'
+import { optionsSchema } from './validators.ts'
 import { DissectOptions } from "../types/types.ts"
 import { CheerioAPI } from 'cheerio'
 
@@ -21,9 +21,8 @@ class Dissection {
    * 
    * @param {string} selector CSS selector to grab
    * @param {DissectOptions} [options] Additional dissection options. Only use if you want to override the initial constructor options
-   * @returns {}
    */
-  get(selector: string, options: DissectOptions = this.options) {
+  get(selector: string, options: DissectOptions = this.options): string | string[] {
     const elements = this.$(selector)
     options = optionsSchema.parse(options)
     

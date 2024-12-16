@@ -16,7 +16,7 @@ function addToResults<K extends string>(key: K, value: string | string[], result
 }
 
 function processSelectorArray(selectors: string[], key: string, dissection: Dissection, options: DissectOptions, results: Results, depth: number): void {
-  const iterations: any[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
+  const iterations: string[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
 
   // Every output is checked if existant. If it is null it returns []. This might be triggered if there are no selectors or if the filter filters everything out.
   switch (options.arrayType) {
@@ -27,7 +27,7 @@ function processSelectorArray(selectors: string[], key: string, dissection: Diss
       addToResults(key, iterations.flat() || [], results)
       break
     case 'priority': // Only the first non-empty selector is added to the results.
-      const firstNonEmpty = iterations.find((item: string | any[]) => item.length > 0)
+      const firstNonEmpty = iterations.find((item: string | string[]) => item.length > 0)
       addToResults(key, firstNonEmpty || [], results)
       break
   }
@@ -69,7 +69,7 @@ function iterateSelectors<T extends object>(
 function iterateObjectSelectors<T extends Results>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
   if (depth > options.maxDepth) throw new DissectionError(`Maximum recursion depth of ${options.maxDepth} exceeded`)
 
-  let results: Results = {}
+  const results: Results = {}
 
   for (const [key, selector] of Object.entries(selectors)) {
     // A key, value pair might be { key: "paragraphs", selector: "p"}
@@ -97,7 +97,7 @@ function iterateObjectSelectors<T extends Results>(selectors: T, dissection: Dis
 function iterateArraySelectors<T extends string[]>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
   if (depth > options.maxDepth) throw new DissectionError(`Maximum recursion depth of ${options.maxDepth} exceeded`)
 
-  let results: string[] = [] as unknown as T
+  const results: string[] = [] as unknown as T
 
   selectors.forEach((selector: string, i: number) => addToResults(i.toString(), dissection.get(selector, options), results)) // A selector might be "title"
 

@@ -1,4 +1,4 @@
-import { optionsSchema, selectorSchema } from "../lib/validators"
+import { optionsSchema, selectorSchema } from "../lib/validators.ts"
 import z from 'zod'
 
 /**
