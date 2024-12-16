@@ -1,7 +1,7 @@
 import { ZodError } from "zod"
-import dissect from "../src/index.ts"
+import dissect from "../../src/index.ts"
 import * as assert from "assert"
-import Dissection from "../src/lib/Dissection.ts"
+import Dissection from "../../src/lib/Dissection.ts"
 
 import { readFileSync } from "fs"
 import { createServer } from "http"
@@ -209,11 +209,3 @@ describe('Dissection', () => {
     })
   })
 })
-
-const response = await dissect("hi", {
-  title: "title"
-}, {
-  extract: "text"
-})
-
-response
