@@ -11,7 +11,7 @@ type DissectOptions = Readonly<z.infer<typeof optionsSchema>>
  */
 type DissectSelector = Readonly<z.infer<typeof selectorSchema>>
 
-type Results<K extends string = string> = { [key in K]: (string | string[])[] }
+type Results<T extends string = string> = { [K in T]: (string | string[])[] }
 
 interface SelectorPair {
   selectors: string | string[];

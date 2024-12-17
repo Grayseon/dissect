@@ -2,6 +2,21 @@ import { optionsSchema } from './validators'
 import { DissectOptions } from "../types/types"
 import { CheerioAPI } from 'cheerio'
 
+function processAllOptions($: CheerioAPI, elements: CheerioAPI, options: DissectOptions){
+  options.postProcessing(elements.map((_, el) => {
+    const element = $(el)
+    if (options.extract == 'text') return element.text()?.trim()
+    if (options.extract == 'html') return element.html()?.trim()
+    if (options.extract == 'element') return element
+    if (options.extract == 'attr' && options.attr) return element.attr(options.attr)?.trim() || null
+    return []
+  })
+  .get()
+  .filter(options.filter)
+  .map(options.map)
+)
+}
+
 /** Dissection for a page. Allows you to get data from a page after-the-fact */
 class Dissection {
   $: CheerioAPI
@@ -22,7 +37,7 @@ class Dissection {
    * @param {string} selector CSS selector to grab
    * @param {DissectOptions} [options] Additional dissection options. Only use if you want to override the initial constructor options
    */
-  get(selector: string, options: DissectOptions = this.options): string | string[] {
+  get(selector: string, options: DissectOptions = this.options): string[] | CheerioAPI[] {
     const elements = this.$(selector)
     options = optionsSchema.parse(options)
     
@@ -30,18 +45,7 @@ class Dissection {
       return []
     }
     
-    return options.postProcessing(elements.map((_, el) => {
-        const element = this.$(el)
-        if (options.extract == 'text') return element.text()?.trim()
-        if (options.extract == 'html') return element.html()?.trim()
-        if (options.extract == 'element') return element
-        if (options.extract == 'attr' && options.attr) return element.attr(options.attr)?.trim() || null
-        return []
-      })
-      .get()
-      .filter(options.filter)
-      .map(options.map)
-    )
+    return 
   }
 }
 

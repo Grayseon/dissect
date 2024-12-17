@@ -22,14 +22,12 @@ const optionsSchema = z.object({
   map: z
     .function()
     .args(z.any())
-    .returns(z.string()),
+    .returns(z.string())
+    .default(() => (data: string) => data),
   postProcessing: z
     .function()
     .args(z.any())
-    .returns(z.union([
-      z.string(),
-      z.array(z.string())
-    ]))
+    .returns(z.array(z.string()))
     .default(() => (data: string[]) => data)
 }).refine(
   (data) => data.extract !== 'attr' || (data.extract === 'attr' && data.attr),
@@ -51,6 +49,9 @@ const selectorValueSchema: z.ZodSchema = z.lazy(() =>
   ])
 )
 
-const selectorSchema = z.record(z.string().min(1, 'Key must be non-empty'), selectorValueSchema)
+const selectorSchema = z.record(
+  z.string().min(1, 'Key must be non-empty'),
+  selectorValueSchema
+)
 
 export { urlSchema, selectorSchema, optionsSchema }

@@ -12,6 +12,9 @@
     "build:cjs": "tsc -p ./configs/tsconfig.cjs.json",
     "build:esm": "tsc -p ./configs/tsconfig.esm.json"
   },
+  "files": [
+    "dist"
+  ],
   "author": "Grayseon",
   "license": "ISC",
   "dependencies": {

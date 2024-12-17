@@ -1,7 +1,7 @@
 import { ZodError } from "zod"
-import dissect from "../../src/index.ts"
+import dissect from "../dist/esm/index.js"
 import * as assert from "assert"
-import Dissection from "../../src/lib/Dissection.ts"
+import Dissection from "../dist/esm/lib/Dissection.js"
 
 import { readFileSync } from "fs"
 import { createServer } from "http"
@@ -207,5 +207,6 @@ describe('Dissection', () => {
         return data
       }
     })
+    results.author.
   })
 })
