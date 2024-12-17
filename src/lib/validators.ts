@@ -3,36 +3,47 @@ import { z } from "zod"
 const urlSchema = z.string().url('URL must be a valid URL').min(1, 'URL most be a valid, non-empty string')
 
 const optionsSchema = z.object({
-  extract: z.enum(['text', 'html', 'attr', 'element'], { message: "Extraction type must be either 'text', 'html', 'element', or 'attr'." }).default('text'),
+  extract: z
+    .enum(['text', 'html', 'attr', 'element'], { message: "Extraction type must be either 'text', 'html', 'element', or 'attr'." })
+    .default('text'),
   attr: z.string().optional(),
-  arrayType: z.enum(['priority', 'all', 'flatAll'], { message: "Array type must be either 'priority', 'all', or 'flatAll'" }).default('flatAll'),
-  maxDepth: z.number().positive('Recursion depth must be positive').default(5),
-  filter: z.function().returns(z.void()).default(() => () => true),
-  map: z.function().returns(z.void()).default(() => (data: string) => data),
+  arrayType: z
+    .enum(['priority', 'all', 'flatAll'], { message: "Array type must be either 'priority', 'all', or 'flatAll'" })
+    .default('flatAll'),
+  maxDepth: z
+    .number()
+    .positive('Recursion depth must be positive')
+    .default(5),
+  filter: z
+    .function()
+    .args(z.any())
+    .returns(z.boolean())
+    .default(() => () => true),
+  map: z
+    .function()
+    .args(z.any())
+    .returns(z.string()),
   postProcessing: z
-  .function()
-  .args(z.string())
-  .returns(z.union([
-    z.string(),
-    z.array(z.string())
-  ]))
-  .default(() => (data: string[]) => data)
+    .function()
+    .args(z.any())
+    .returns(z.union([
+      z.string(),
+      z.array(z.string())
+    ]))
+    .default(() => (data: string[]) => data)
 }).refine(
   (data) => data.extract !== 'attr' || (data.extract === 'attr' && data.attr),
   { message: "If extraction type is 'attr', the 'attr' field must be provided." }
 )
 
-type SelectorValueTuple = [string | SelectorValue, z.infer<typeof optionsSchema>]
-type SelectorValue = string | SelectorValueTuple | (string | SelectorValueTuple)[]
-
-const selectorValueTupleSchema: z.ZodSchema<SelectorValueTuple> = z.lazy(() =>
+const selectorValueTupleSchema: z.ZodSchema = z.lazy(() =>
   z.tuple([
     z.union([z.string(), selectorValueSchema]),
     optionsSchema,
   ])
 )
 
-const selectorValueSchema: z.ZodSchema<SelectorValue> = z.lazy(() =>
+const selectorValueSchema: z.ZodSchema = z.lazy(() =>
   z.union([
     z.string().min(1, "Value must be non-empty"),
     selectorValueTupleSchema,

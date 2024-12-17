@@ -1,10 +1,10 @@
 import ky from "ky"
 import * as cheerio from "cheerio"
-import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.ts"
-import { iterateSelectors } from "./lib/selectorEval.js"
-import Dissection from "./lib/Dissection.ts"
-import DissectionError from "./lib/DissectionError.ts"
-import { DissectOptions, DissectSelector, Results } from "./types/types.js"
+import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators"
+import { iterateSelectors } from "./lib/selectorEval"
+import Dissection from "./lib/Dissection"
+import DissectionError from "./lib/DissectionError"
+import { DissectOptions, DissectSelector, Results } from "./types/types"
 
 /**
  * Dissects a webpage
