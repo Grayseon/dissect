@@ -52,6 +52,6 @@ const selectorValueSchema: z.ZodSchema = z.lazy(() =>
 const selectorSchema = z.record(
   z.string().min(1, 'Key must be non-empty'),
   selectorValueSchema
-)
+).optional()
 
 export { urlSchema, selectorSchema, optionsSchema }

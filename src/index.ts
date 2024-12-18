@@ -14,7 +14,7 @@ import * as cheerio from "cheerio"
  * @returns {object|Dissection} Results of the search. If no selectors are initially provided, it will return a Dissection constructor.
  * @throws {Error} Errors may be thrown due to network errors or invalid inputs
  */
-async function dissect<T extends DissectSelector | undefined>(
+async function dissect<T extends DissectSelector>(
   url: string,
   selectors?: T,
   options?: DissectOptions
@@ -25,7 +25,7 @@ async function dissect<T extends DissectSelector | undefined>(
   
   if (selectors) selectorSchema.parse(selectors)
 
-  const validatedOptions = optionsSchema.parse(options)
+  const validatedOptions = optionsSchema.parse(options || {})
   let response: string
   let $: cheerio.CheerioAPI
 
