@@ -207,6 +207,6 @@ describe('Dissection', () => {
         return data
       }
     })
-    results.author.
+    
   })
 })

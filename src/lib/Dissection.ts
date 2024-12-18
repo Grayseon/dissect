@@ -1,9 +1,9 @@
 import { optionsSchema } from './validators'
 import { DissectOptions } from "../types/types"
-import { CheerioAPI } from 'cheerio'
+import { Cheerio, CheerioAPI } from 'cheerio'
 
-function processAllOptions($: CheerioAPI, elements: CheerioAPI, options: DissectOptions){
-  options.postProcessing(elements.map((_, el) => {
+function processAllOptions($: CheerioAPI, elements: Cheerio<any>, options: DissectOptions): string[] | CheerioAPI[] {
+  return options.postProcessing(elements.map((_, el) => {
     const element = $(el)
     if (options.extract == 'text') return element.text()?.trim()
     if (options.extract == 'html') return element.html()?.trim()
@@ -45,7 +45,11 @@ class Dissection {
       return []
     }
     
-    return 
+    if(options.extract == "element") {
+      return processAllOptions(this.$, elements, options) as CheerioAPI[]
+    } else {
+      return processAllOptions(this.$, elements, options) as string[]
+    }
   }
 }
 
