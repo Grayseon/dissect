@@ -1,7 +1,7 @@
 import { ZodError } from "zod"
 import dissect from "../dist/esm/index.js"
 import * as assert from "assert"
-import Dissection from "../dist/esm/lib/Dissection.js"
+import Dissection from "../dist/esm/lib/Dissection.mjs"
 
 import { readFileSync } from "fs"
 import { createServer } from "http"

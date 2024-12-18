@@ -1,4 +1,4 @@
-import { optionsSchema, selectorSchema } from "../lib/validators"
+import { optionsSchema, selectorSchema } from "../lib/validators.mjs"
 import z from 'zod'
 
 /**
@@ -11,7 +11,23 @@ type DissectOptions = Readonly<z.infer<typeof optionsSchema>>
  */
 type DissectSelector = Readonly<z.infer<typeof selectorSchema>>
 
-type Results<T extends string = string> = { [K in T]: (string | string[])[] }
+/**
+ * The results of a selection. User might make the key anything.
+ * @example
+ * {
+ *  "title": ["The Verge"],
+ *  "p": [ (cheerio element) ]
+ *  "author": [
+ *    [
+ *      "John Doe"
+ *    ],
+ *    [
+ *      "Jane Doe"
+ *    ]
+ *  ]
+ * }
+ */
+type Results = { [key: string]: any[] };
 
 interface SelectorPair {
   selectors: string | string[];

@@ -1,8 +1,8 @@
-import { DissectOptions, Results, SelectorPair } from "../types/types"
-import DissectionError from "./DissectionError"
-import Dissection from "./Dissection"
+import { DissectOptions, Results, SelectorPair } from "../types/types.mjs"
+import DissectionError from "./DissectionError.mjs"
+import Dissection from "./Dissection.mjs"
 
-function addToResults<K extends string>(key: K, value: string | string[], results: Results<K> | string[]): void {
+function addToResults(key: string, value: any[], results: Results | string[]): void {
   if (!value) return
   if (Array.isArray(results)) { // Selectors will be an array if the user uses multiple selectors in the same selector key. title: ['title', 'meta[type="og:title"']]
     if (Array.isArray(value)) {
@@ -16,7 +16,7 @@ function addToResults<K extends string>(key: K, value: string | string[], result
 }
 
 function processSelectorArray(selectors: string[], key: string, dissection: Dissection, options: DissectOptions, results: Results, depth: number): void {
-  const iterations: string[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
+  const iterations: any[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
 
   // Every output is checked if existant. If it is null it returns []. This might be triggered if there are no selectors or if the filter filters everything out.
   switch (options.arrayType) {

@@ -1,5 +1,5 @@
-import { optionsSchema } from './validators'
-import { DissectOptions } from "../types/types"
+import { optionsSchema } from './validators.mjs'
+import { DissectOptions } from "../types/types.mjs"
 import { Cheerio, CheerioAPI } from 'cheerio'
 
 function processAllOptions($: CheerioAPI, elements: Cheerio<any>, options: DissectOptions): string[] | CheerioAPI[] {
@@ -37,7 +37,7 @@ class Dissection {
    * @param {string} selector CSS selector to grab
    * @param {DissectOptions} [options] Additional dissection options. Only use if you want to override the initial constructor options
    */
-  get(selector: string, options: DissectOptions = this.options): string[] | CheerioAPI[] {
+  get(selector: string, options: DissectOptions = this.options): any[] {
     const elements = this.$(selector)
     options = optionsSchema.parse(options)
     
