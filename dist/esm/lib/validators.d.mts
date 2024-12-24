@@ -41,5 +41,6 @@ declare const optionsSchema: z.ZodEffects<z.ZodObject<{
     filter?: ((args_0: any, ...args: unknown[]) => any) | undefined;
     postProcessing?: ((args_0: any, ...args: unknown[]) => any) | undefined;
 }>;
+declare const selectorValueSchema: z.ZodSchema;
 declare const selectorSchema: z.ZodOptional<z.ZodRecord<z.ZodString, z.ZodType<any, z.ZodTypeDef, any>>>;
-export { urlSchema, selectorSchema, optionsSchema };
+export { urlSchema, selectorSchema, selectorValueSchema, optionsSchema };

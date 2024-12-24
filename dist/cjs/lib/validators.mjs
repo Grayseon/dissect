@@ -49,5 +49,5 @@ const selectorValueSchema = z.lazy(() => z.union([
 const selectorSchema = z
     .record(z.string().min(1, 'Key must be non-empty'), selectorValueSchema)
     .optional();
-export { urlSchema, selectorSchema, optionsSchema };
+export { urlSchema, selectorSchema, selectorValueSchema, optionsSchema };
 //# sourceMappingURL=validators.mjs.map
