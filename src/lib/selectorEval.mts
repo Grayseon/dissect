@@ -1,10 +1,15 @@
-import { DissectOptions, Results, SelectorPair } from "../types/types.mjs"
-import DissectionError from "./DissectionError.mjs"
-import Dissection from "./Dissection.mjs"
+import { DissectOptions, Results, SelectorPair } from '../types/types.mjs'
+import DissectionError from './DissectionError.mjs'
+import Dissection from './Dissection.mjs'
 
-function addToResults(key: string, value: any[], results: Results | string[]): void {
+function addToResults(
+  key: string,
+  value: any[],
+  results: Results | string[]
+): void {
   if (!value) return
-  if (Array.isArray(results)) { // Selectors will be an array if the user uses multiple selectors in the same selector key. title: ['title', 'meta[type="og:title"']]
+  if (Array.isArray(results)) {
+    // Selectors will be an array if the user uses multiple selectors in the same selector key. title: ['title', 'meta[type="og:title"']]
     if (Array.isArray(value)) {
       results.push(...value) // Spread to add multiple values in case value is a string[]
     } else {
@@ -15,8 +20,20 @@ function addToResults(key: string, value: any[], results: Results | string[]): v
   }
 }
 
-function processSelectorArray(selectors: string[], key: string, dissection: Dissection, options: DissectOptions, results: Results, depth: number): void {
-  const iterations: any[] = iterateArraySelectors(selectors, dissection, options, depth + 1)
+function processSelectorArray(
+  selectors: string[],
+  key: string,
+  dissection: Dissection,
+  options: DissectOptions,
+  results: Results,
+  depth: number
+): void {
+  const iterations: any[] = iterateArraySelectors(
+    selectors,
+    dissection,
+    options,
+    depth + 1
+  )
 
   // Every output is checked if existant. If it is null it returns []. This might be triggered if there are no selectors or if the filter filters everything out.
   switch (options.arrayType) {
@@ -27,8 +44,11 @@ function processSelectorArray(selectors: string[], key: string, dissection: Diss
       addToResults(key, iterations.flat() || [], results)
       break
     case 'priority': // Only the first non-empty selector is added to the results.
-      const firstNonEmpty = iterations.find((item: string | string[]) => item.length > 0)
-      addToResults(key, firstNonEmpty || [], results)
+      addToResults(
+        key,
+        iterations.find((item: string | string[]) => item.length > 0) || [],
+        results
+      )
       break
   }
 }
@@ -51,10 +71,15 @@ function iterateSelectors<T extends object>(
   options: DissectOptions,
   depth = 0
 ): T | string[] {
-  if(Array.isArray(selectors)){
+  if (Array.isArray(selectors)) {
     return iterateArraySelectors(selectors, dissection, options, depth)
-  }else{
-    return iterateObjectSelectors(selectors as Results, dissection, options, depth) as T
+  } else {
+    return iterateObjectSelectors(
+      selectors as Results,
+      dissection,
+      options,
+      depth
+    ) as T
   }
 }
 
@@ -66,8 +91,16 @@ function iterateSelectors<T extends object>(
  *  }]
  * }
  */
-function iterateObjectSelectors<T extends Results>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
-  if (depth > options.maxDepth) throw new DissectionError(`Maximum recursion depth of ${options.maxDepth} exceeded`)
+function iterateObjectSelectors<T extends Results>(
+  selectors: T,
+  dissection: Dissection,
+  options: DissectOptions,
+  depth: number = 0
+): T {
+  if (depth > options.maxDepth)
+    throw new DissectionError(
+      `Maximum recursion depth of ${options.maxDepth} exceeded`
+    )
 
   const results: Results = {}
 
@@ -79,14 +112,28 @@ function iterateObjectSelectors<T extends Results>(selectors: T, dissection: Dis
       options: selector[1]
     }
 
-    if (typeof selector[1] == 'object' && !(Array.isArray(selector[1]))) { // User is providing new, custom options
+    if (typeof selector[1] == 'object' && !Array.isArray(selector[1])) {
+      // User is providing new, custom options
       options = { ...options, ...formattedPair.options }
     }
 
-    if (typeof formattedPair.selectors == "string") { // Or "if they are passing a single selector"
-      addToResults(key, dissection.get(formattedPair.selectors, options), results)
-    } else if (Array.isArray(formattedPair.selectors)) { // Or "if they are passing multiple selectors"
-      processSelectorArray(formattedPair.selectors, key, dissection, options, results, depth)
+    if (typeof formattedPair.selectors == 'string') {
+      // Or "if they are passing a single selector"
+      addToResults(
+        key,
+        dissection.get(formattedPair.selectors, options),
+        results
+      )
+    } else if (Array.isArray(formattedPair.selectors)) {
+      // Or "if they are passing multiple selectors"
+      processSelectorArray(
+        formattedPair.selectors,
+        key,
+        dissection,
+        options,
+        results,
+        depth
+      )
     }
   }
 
@@ -96,12 +143,22 @@ function iterateObjectSelectors<T extends Results>(selectors: T, dissection: Dis
 /** Iterate through an array selector. For example, an array selector might look like:
  * ["title", "p", "meta=[property=title]"]
  */
-function iterateArraySelectors<T extends string[]>(selectors: T, dissection: Dissection, options: DissectOptions, depth: number = 0): T {
-  if (depth > options.maxDepth) throw new DissectionError(`Maximum recursion depth of ${options.maxDepth} exceeded`)
+function iterateArraySelectors<T extends string[]>(
+  selectors: T,
+  dissection: Dissection,
+  options: DissectOptions,
+  depth: number = 0
+): T {
+  if (depth > options.maxDepth)
+    throw new DissectionError(
+      `Maximum recursion depth of ${options.maxDepth} exceeded`
+    )
 
   const results: string[] = [] as unknown as T
 
-  selectors.forEach((selector: string, i: number) => addToResults(i.toString(), dissection.get(selector, options), results)) // A selector might be "title"
+  selectors.forEach((selector: string, i: number) =>
+    addToResults(i.toString(), dissection.get(selector, options), results)
+  ) // A selector might be "title"
 
   return results as T
 }

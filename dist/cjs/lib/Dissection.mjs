@@ -1,7 +1,8 @@
 "use strict";
 import { optionsSchema } from './validators.mjs';
 function processAllOptions($, elements, options) {
-    return options.postProcessing(elements.map((_, el) => {
+    return options.postProcessing(elements
+        .map((_, el) => {
         const element = $(el);
         if (options.extract == 'text')
             return element.text()?.trim();
@@ -42,7 +43,7 @@ class Dissection {
         if (!elements.length) {
             return [];
         }
-        if (options.extract == "element") {
+        if (options.extract == 'element') {
             returnValue = processAllOptions(this.$, elements, options);
         }
         else {

@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from 'zod';
 declare const urlSchema: z.ZodString;
 declare const optionsSchema: z.ZodEffects<z.ZodObject<{
     extract: z.ZodDefault<z.ZodEnum<["text", "html", "attr", "element"]>>;

@@ -1,10 +1,28 @@
-import { urlSchema, optionsSchema, selectorSchema } from "./lib/validators.mjs"
-import { DissectOptions, DissectSelector, Results } from "./types/types.mjs"
-import { iterateSelectors } from "./lib/selectorEval.mjs"
-import Dissection from "./lib/Dissection.mjs"
-import DissectionError from "./lib/DissectionError.mjs"
-import ky from "ky"
-import * as cheerio from "cheerio"
+import { urlSchema, optionsSchema, selectorSchema } from './lib/validators.mjs'
+import {
+  DissectOptions,
+  DissectSelector,
+  Results,
+  DissectSelectorValueSchema
+} from './types/types.mjs'
+import { iterateSelectors } from './lib/selectorEval.mjs'
+import Dissection from './lib/Dissection.mjs'
+import DissectionError from './lib/DissectionError.mjs'
+import ky from 'ky'
+import * as cheerio from 'cheerio'
+
+/**
+ * Make your options easier to read
+ * @param selectors
+ * @param options
+ */
+function options(
+  selectors: DissectSelectorValueSchema,
+  options: DissectOptions
+) {
+  const selectorsAsArray = Array.isArray(selectors) ? selectors : [selectors]
+  return [selectorsAsArray, options]
+}
 
 /**
  * Dissects a webpage
@@ -22,7 +40,7 @@ async function dissect<T extends DissectSelector>(
   T extends undefined ? Dissection : { [K in keyof T]: (string | string[])[] }
 > {
   urlSchema.parse(url)
-  
+
   if (selectors) selectorSchema.parse(selectors)
 
   const validatedOptions = optionsSchema.parse(options || {})
@@ -39,12 +57,19 @@ async function dissect<T extends DissectSelector>(
   const dissection = new Dissection($, validatedOptions)
 
   if (selectors) {
-    return iterateSelectors(selectors as Results, dissection, validatedOptions) as T extends undefined
+    return iterateSelectors(
+      selectors as Results,
+      dissection,
+      validatedOptions
+    ) as T extends undefined
       ? Dissection
       : { [K in keyof T]: (string | string[])[] }
   } else {
-    return dissection as T extends undefined ? Dissection : { [K in keyof T]: (string | string[])[] }
+    return dissection as T extends undefined
+      ? Dissection
+      : { [K in keyof T]: (string | string[])[] }
   }
 }
 
 export default dissect
+export { options }

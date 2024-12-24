@@ -1,9 +1,10 @@
 "use strict";
-import DissectionError from "./DissectionError.mjs";
+import DissectionError from './DissectionError.mjs';
 function addToResults(key, value, results) {
     if (!value)
         return;
-    if (Array.isArray(results)) { // Selectors will be an array if the user uses multiple selectors in the same selector key. title: ['title', 'meta[type="og:title"']]
+    if (Array.isArray(results)) {
+        // Selectors will be an array if the user uses multiple selectors in the same selector key. title: ['title', 'meta[type="og:title"']]
         if (Array.isArray(value)) {
             results.push(...value); // Spread to add multiple values in case value is a string[]
         }
@@ -26,8 +27,7 @@ function processSelectorArray(selectors, key, dissection, options, results, dept
             addToResults(key, iterations.flat() || [], results);
             break;
         case 'priority': // Only the first non-empty selector is added to the results.
-            const firstNonEmpty = iterations.find((item) => item.length > 0);
-            addToResults(key, firstNonEmpty || [], results);
+            addToResults(key, iterations.find((item) => item.length > 0) || [], results);
             break;
     }
 }
@@ -58,13 +58,16 @@ function iterateObjectSelectors(selectors, dissection, options, depth = 0) {
             selectors: Array.isArray(selector) ? selector[0] : selector,
             options: selector[1]
         };
-        if (typeof selector[1] == 'object' && !(Array.isArray(selector[1]))) { // User is providing new, custom options
+        if (typeof selector[1] == 'object' && !Array.isArray(selector[1])) {
+            // User is providing new, custom options
             options = { ...options, ...formattedPair.options };
         }
-        if (typeof formattedPair.selectors == "string") { // Or "if they are passing a single selector"
+        if (typeof formattedPair.selectors == 'string') {
+            // Or "if they are passing a single selector"
             addToResults(key, dissection.get(formattedPair.selectors, options), results);
         }
-        else if (Array.isArray(formattedPair.selectors)) { // Or "if they are passing multiple selectors"
+        else if (Array.isArray(formattedPair.selectors)) {
+            // Or "if they are passing multiple selectors"
             processSelectorArray(formattedPair.selectors, key, dissection, options, results, depth);
         }
     }

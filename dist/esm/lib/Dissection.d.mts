@@ -1,4 +1,4 @@
-import { DissectOptions } from "../types/types.mjs";
+import { DissectOptions } from '../types/types.mjs';
 import { CheerioAPI } from 'cheerio';
 /** Dissection for a page. Allows you to get data from a page after-the-fact */
 declare class Dissection {
