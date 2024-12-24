@@ -1,0 +1,1 @@
+{"version":3,"file":"DissectionError.mjs","sourceRoot":"","sources":["../../../src/lib/DissectionError.mts"],"names":[],"mappings":"AAAA,MAAM,CAAC,OAAO,OAAO,eAAgB,SAAQ,KAAK;IAChD,YAAY,OAAe;QACzB,KAAK,CAAC,OAAO,CAAC,CAAC;QACf,IAAI,CAAC,IAAI,GAAG,iBAAiB,CAAC;IAChC,CAAC;CACF"}

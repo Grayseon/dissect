@@ -17,17 +17,17 @@ const optionsSchema = z.object({
   filter: z
     .function()
     .args(z.any())
-    .returns(z.boolean())
+    .returns(z.any())
     .default(() => () => true),
   map: z
     .function()
     .args(z.any())
-    .returns(z.string())
+    .returns(z.any())
     .default(() => (data: string) => data),
   postProcessing: z
     .function()
     .args(z.any())
-    .returns(z.array(z.string()))
+    .returns(z.any())
     .default(() => (data: string[]) => data)
 }).refine(
   (data) => data.extract !== 'attr' || (data.extract === 'attr' && data.attr),

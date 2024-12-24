@@ -21,7 +21,7 @@ async function dissect<T extends DissectSelector>(
 ): Promise<
   T extends undefined ? Dissection : { [K in keyof T]: (string | string[])[] }
 > {
-  if (url) urlSchema.parse(url)
+  urlSchema.parse(url)
   
   if (selectors) selectorSchema.parse(selectors)
 

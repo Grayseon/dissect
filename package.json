@@ -5,6 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "test": "mocha --require ts-node/register",
+    "preview": "npm run build && npm run test",
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "clean": "rm -rf ./dist",

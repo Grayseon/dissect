@@ -39,6 +39,7 @@ class Dissection {
    */
   get(selector: string, options: DissectOptions = this.options): any[] {
     const elements = this.$(selector)
+    let returnValue = []
     options = optionsSchema.parse(options)
     
     if (!elements.length) {
@@ -46,10 +47,12 @@ class Dissection {
     }
     
     if(options.extract == "element") {
-      return processAllOptions(this.$, elements, options) as CheerioAPI[]
+      returnValue = processAllOptions(this.$, elements, options) as CheerioAPI[]
     } else {
-      return processAllOptions(this.$, elements, options) as string[]
+      returnValue = processAllOptions(this.$, elements, options) as string[]
     }
+
+    return returnValue
   }
 }
 

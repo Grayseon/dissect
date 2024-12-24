@@ -74,17 +74,19 @@ function iterateObjectSelectors<T extends Results>(selectors: T, dissection: Dis
   for (const [key, selector] of Object.entries(selectors)) {
     // A key, value pair might be { key: "paragraphs", selector: "p"}
     // or "1": { key: "paragraphs", selector: ["p", { extract: "text" }]}
-    if (typeof selector[1] == 'object' && !(Array.isArray(selector[1]))) { // User is providing new, custom options
-      const formattedPair: SelectorPair = {
-        selectors: selector[0],
-        options: selector[1]
-      }
+    const formattedPair: SelectorPair = {
+      selectors: Array.isArray(selector) ? selector[0] : selector,
+      options: selector[1]
+    }
 
-      if (typeof formattedPair.selectors == "string") { // Or "if they are passing a single selector"
-        addToResults(key, dissection.get(formattedPair.selectors, { ...options, ...formattedPair.options }), results)
-      } else if (Array.isArray(formattedPair.selectors)) { // Or "if they are passing multiple selectors"
-        processSelectorArray(formattedPair.selectors, key, dissection, { ...options, ...formattedPair.options }, results, depth)
-      }
+    if (typeof selector[1] == 'object' && !(Array.isArray(selector[1]))) { // User is providing new, custom options
+      options = { ...options, ...formattedPair.options }
+    }
+
+    if (typeof formattedPair.selectors == "string") { // Or "if they are passing a single selector"
+      addToResults(key, dissection.get(formattedPair.selectors, options), results)
+    } else if (Array.isArray(formattedPair.selectors)) { // Or "if they are passing multiple selectors"
+      processSelectorArray(formattedPair.selectors, key, dissection, options, results, depth)
     }
   }
 
