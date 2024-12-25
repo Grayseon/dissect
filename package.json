@@ -10,6 +10,7 @@
       "import": "./dist/esm/index.js"
     }
   },
+  "type": "module",
   "scripts": {
     "test": "mocha --require ts-node/register",
     "preview": "npm run build && npm run test",

@@ -1,10 +1,9 @@
-const { ZodError } = require('zod')
-const dissect = require('../dist/esm/index.js')
-const assert = require('assert')
-const Dissection = require('../dist/esm/lib/Dissection.js')
-
-const { readFileSync } = require('fs')
-const { createServer } = require('http')
+import { ZodError } from 'zod'
+import dissect from '../dist/esm/index.js'
+import { assert } from 'chai'
+import Dissection from '../dist/esm/lib/Dissection.js'
+import { readFileSync } from 'fs'
+import { createServer } from 'http'
 
 const url = 'http://localhost:8083'
 let server
