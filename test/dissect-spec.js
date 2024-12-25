@@ -1,10 +1,10 @@
-import { ZodError } from "zod"
-import dissect from "../dist/esm/index.mjs"
-import * as assert from "assert"
-import Dissection from "../dist/esm/lib/Dissection.mjs"
+const { ZodError } = require('zod')
+const dissect = require('../dist/esm/index.js')
+const assert = require('assert')
+const Dissection = require('../dist/esm/lib/Dissection.js')
 
-import { readFileSync } from "fs"
-import { createServer } from "http"
+const { readFileSync } = require('fs')
+const { createServer } = require('http')
 
 const url = 'http://localhost:8083'
 let server
@@ -172,7 +172,7 @@ describe('Dissection', () => {
         data.reverse()
       )
     })
-
+    
     const filterWorks = results.paragraphs.indexOf('') == -1
     const mapWorks = results.paragraphs[1].indexOf('e') == -1
     const postProcessingWorks = results.paragraphs[2] == "This is paragraph 2"

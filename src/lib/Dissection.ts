@@ -1,5 +1,5 @@
-import { optionsSchema } from './validators.mjs'
-import { DissectOptions } from '../types/types.mjs'
+import { optionsSchema } from './validators.js'
+import { DissectOptions } from '../types/types.js'
 import { Cheerio, CheerioAPI } from 'cheerio'
 
 function processAllOptions(

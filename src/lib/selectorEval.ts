@@ -1,6 +1,6 @@
-import { DissectOptions, Results, SelectorPair } from '../types/types.mjs'
-import DissectionError from './DissectionError.mjs'
-import Dissection from './Dissection.mjs'
+import { DissectOptions, Results, SelectorPair } from '../types/types.js'
+import DissectionError from './DissectionError.js'
+import Dissection from './Dissection.js'
 
 function addToResults(
   key: string,

@@ -1,8 +1,9 @@
+//import { CheerioAPI } from 'cheerio'
 import {
   optionsSchema,
   selectorSchema,
   selectorValueSchema
-} from '../lib/validators.mjs'
+} from '../lib/validators.js'
 import z from 'zod'
 
 /**
@@ -37,6 +38,12 @@ type DissectSelectorValueSchema = z.infer<typeof selectorValueSchema>
  * }
  */
 type Results = { [key: string]: any[] }
+
+/* type ExtractType<T, Default> = T extends { extract: 'text' }
+  ? string
+  : T extends { extact: "element" }
+  ? CheerioAPI
+  :  */
 
 interface SelectorPair {
   selectors: string | string[]

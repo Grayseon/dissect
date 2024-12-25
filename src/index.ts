@@ -1,13 +1,13 @@
-import { urlSchema, optionsSchema, selectorSchema } from './lib/validators.mjs'
+import { urlSchema, optionsSchema, selectorSchema } from './lib/validators.js'
 import {
   DissectOptions,
   DissectSelector,
   Results,
   DissectSelectorValueSchema
-} from './types/types.mjs'
-import { iterateSelectors } from './lib/selectorEval.mjs'
-import Dissection from './lib/Dissection.mjs'
-import DissectionError from './lib/DissectionError.mjs'
+} from './types/types.js'
+import { iterateSelectors } from './lib/selectorEval.js'
+import Dissection from './lib/Dissection.js'
+import DissectionError from './lib/DissectionError.js'
 import ky from 'ky'
 import * as cheerio from 'cheerio'
 
