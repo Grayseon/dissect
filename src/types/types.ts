@@ -1,4 +1,3 @@
-//import { CheerioAPI } from 'cheerio'
 import {
   optionsSchema,
   selectorSchema,

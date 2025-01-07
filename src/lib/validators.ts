@@ -12,32 +12,49 @@ const optionsSchema = z
         message:
           "Extraction type must be either 'text', 'html', 'element', or 'attr'."
       })
-      .default('text'),
-    attr: z.string().optional(),
+      .default('text')
+      .describe('The item to look for'),
+    attr: z
+      .string()
+      .optional()
+      .describe(
+        'The attribute to look for. Only used and required if extract is attr.'
+      ),
     arrayType: z
       .enum(['priority', 'all', 'flatAll'], {
         message: "Array type must be either 'priority', 'all', or 'flatAll'"
       })
-      .default('flatAll'),
+      .default('flatAll')
+      .describe('The behavior of the output of multiple selectors'),
     maxDepth: z
       .number()
       .positive('Recursion depth must be positive')
-      .default(5),
+      .default(5)
+      .describe('Change the recursion depth of recursive processes'),
     filter: z
       .function()
       .args(z.any())
       .returns(z.any())
-      .default(() => () => true),
+      .default(() => () => true)
+      .describe(
+        'Filters can include or exclude each individual element of an array of a selector result'
+      ),
     map: z
       .function()
       .args(z.any())
       .returns(z.any())
-      .default(() => (data: string) => data),
+      .default(() => (data: string) => data)
+      .describe(
+        'Maps are applied granularly to each individual element of the array of a selector result'
+      ),
     postProcessing: z
       .function()
       .args(z.any())
       .returns(z.any())
       .default(() => (data: string[]) => data)
+      .describe(
+        'Post-processing is applied to the topmost array of the selector result'
+      )
   })
   .refine(
     (data) => data.extract !== 'attr' || (data.extract === 'attr' && data.attr),
